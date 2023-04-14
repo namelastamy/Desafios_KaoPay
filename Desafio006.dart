@@ -106,3 +106,17 @@ void set pixRecebido(bool value){
 bool get pixRecebido => _pixRecebido;
 }
 
+class Wallet {
+  String id;
+  double saldo;
+  
+  Wallet(this.id, this.saldo);
+}
+
+class User {
+  String name;
+  String phone;
+  String cpf;
+  
+  User(this.name, this.phone, this.cpf);
+}
