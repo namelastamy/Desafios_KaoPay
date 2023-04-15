@@ -1,19 +1,3 @@
-/*A fintech chinesa Alipay está buscando criar uma solução em Dart para permitir pagamentos e recebimentos através de uma carteira digital. 
-Para isso, é necessário desenvolver uma classe em Dart que permita realizar transações de pagamento e recebimento em diversas formas, incluindo débito, crédito parcelado e PIX. 
-Além disso, é importante que a classe seja capaz de armazenar informações adicionais, como a bandeira do cartão de crédito, o nome do estabelecimento onde a compra foi realizada e o nome da pessoa que depositou na carteira, para as transações de crédito parcelado e recebimento, respectivamente.
-
-A carteira digital deve ter um identificador único (id) e um saldo atual (saldo), assim como uma classe User que terá os atributos name, phone e cpf.
-
-Para realizar pagamentos, a carteira digital deve ter métodos específicos para cada forma de pagamento: pagarDebito(valor), pagarCredito(valor) e pagarCreditoParcelado(valor, numParcelas, taxa). O método pagarDebito deve realizar um pagamento de débito no valor especificado e atualizar o saldo da carteira digital. 
-O método pagarCredito deve realizar um pagamento de crédito no valor especificado e atualizar o saldo da carteira digital, armazenando as informações adicionais da transação. O método pagarCreditoParcelado deve realizar um pagamento de crédito parcelado no valor especificado, dividindo-o em um número de parcelas e armazenando as informações adicionais da transação, incluindo o valor da taxa de cada parcela.
-
-Para receber pagamentos, a carteira digital deve ter o método receber(valor), que recebe um pagamento no valor especificado e atualiza o saldo da carteira digital. Este método também deve armazenar as informações adicionais da transação, incluindo o nome da pessoa que depositou na carteira.
-
-Além disso, a classe deve ter um método listarTransacoes() que lista todas as transações realizadas na carteira digital, mostrando a data, hora, valor e informações adicionais para as transações de crédito parcelado.
-
-O objetivo deste desafio é testar suas habilidades em programação orientada a objetos, manipulação de listas e implementação de lógica de negócios. 
-Para testar a classe, você deve criar uma instância da carteira digital com um ID único, criar uma instância da classe User com name, phone e cpf, realizar algumas transações de pagamento e recebimento em diferentes formas de pagamento, e listar todas as transações realizadas. O prazo para a entrega do desafio é de 5 dias a partir da data atual.*/
-
 Class Transacoes {
      double _debito;
      double _creditoParcelado;
@@ -107,16 +91,152 @@ bool get pixRecebido => _pixRecebido;
 }
 
 class Wallet {
-  String id;
-  double saldo;
+  String _id;
+  double _saldo;
+  List<Transacao> transacoes; //lista para armazenar as transações realizadas
   
-  Wallet(this.id, this.saldo);
+  Wallet(
+    this._id, 
+    this._saldo){this.transacoes = []; //inicializa a lista de transacoes vazia
+    }
+
+//Setters e Getters para os atributos privados
+void set id(String value){
+    _id = value;
+}
+
+String get id => _id;
+
+void set saldo(double value){
+    _saldo = value;
+}
+
+double get saldo => _saldo;
+
+void pagarDebito(double value){
+    if(value > _saldo){
+        print("Saldo Insuficiente para Realizar a Transação");
+        Return;
+    }
+
+    _saldo -= value;
+}
+
+void pagarCredito(double value){
+    if(value > _saldo){
+        print("Saldo Insuficiente para Realizar a Transação");
+        return;
+    }
+
+    _saldo -= value;
+//armazena as informaçoes adicionais da transação 
+}
+
+void pagarPix(double value){
+    _saldo -= value;
+    //armazena as informações adicionais da transação
+    var transacao = Transacao(DateTime.now(),value);
+    transacoes.add(transacao);
+}
+
+void pagarCreditoParcelado(double value, int numParcelas, double taxa){
+    if(value > _saldo){
+        print("Saldo Insuficiente para Realizar a Transação.");
+        Return;
+    }
+
+    _saldo -= value;
+//divide o valor em um número de parcelas e armazena as informaçoes adicionais da transação 
+   var valorParcela = value / numParcelas;
+    for (var i = 1; i <= numParcelas; i++) {
+      var data = DateTime.now().add(Duration(days: 30 * i));
+      var transacao = TransacaoCreditoParcelado(data, valorParcela, numParcelas, taxa);
+      transacoes.add(transacao);
+    }
+ }
+
+ void listarTransacoes() {
+    for (var transacao in transacoes) {
+      print('Data: ${transacao.data}');
+      print('Hora: ${transacao.hora}');
+      print('Valor: ${transacao.valor}');
+
+      if (transacao is TransacaoCreditoParcelado) {
+        print(
+            'Informações adicionais: ${transacao.numParcelas} parcelas com taxa de ${transacao.taxa}');
+      }
+    }
+  }
+}
+
+//classe transação para representar uma transação
+class Transacao{
+    DateTime data;
+    double value;
+    String hora;
+
+    Transacao(this.data,this.value){
+        this.hora ='${data.hour}:${data.minute}';
+    }
 }
 
 class User {
-  String name;
-  String phone;
-  String cpf;
+  String _name;
+  String _phone;
+  String _cpf;
+  Wallet _carteira;
   
-  User(this.name, this.phone, this.cpf);
+  User(
+    this._name, 
+    this._phone, 
+    this._cpf,
+    this._carteira);
+
+//Setters e Getters para os atributos privados
+void set name(String value){
+    _name = value;
+}
+
+String get name => _name;
+
+void set phone(String value){
+    _phone = value;
+}
+
+String get phone => _phone;
+
+void set cpf(String value){
+    _cpf = value;
+}
+
+String get cpf => cpf;
+
+Wallet get carteira => _carteira
+}
+
+void main(){
+
+//instancia da carteira com ID unico
+var carteira = Wallet(id: '123456789');
+
+//instancia da class User
+var user = User(name: 'Naomy', phone: '123456789', cpf: '12345678901');
+
+// Adiciona saldo à carteira digital
+carteira.adicionarSaldo(1854);
+
+// Realiza uma transação de pagamento com cartão de crédito
+carteira.pagarCredito(user, 500, 'Visa', 'supermercado yroyak', 50.09);
+
+// Realiza uma transação de pagamento com cartão de débito
+carteira.pagarDebito(user, 200, 'Mastercard', 'Pandora',581.40);
+
+// Realiza uma transação de pagamento com PIX
+carteira.pagarPix(user, 100, 25.47);
+
+// Realiza uma transação de pagamento com cartão de credito parcelado
+carteira.pagarCreditoParcelado(user, 300, 'Elo', 'KaoPay', 897.45);
+
+//listar as transações
+print(carteira.listarTransacoes());
 }
